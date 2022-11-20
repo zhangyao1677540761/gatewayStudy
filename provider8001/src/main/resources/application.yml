@@ -1,0 +1,71 @@
+server:
+  port: 8001
+
+spring:
+  application:
+    name: provide-8001   #服务名称
+  datasource:   #数据源
+    username: root
+    password: zy
+    url: jdbc:mysql://localhost:3306/javaweb?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      max-wait: 1000
+      initial-size: 10
+      max-active: 30
+      min-idle: 10
+      #配置druid监控页
+      aop-patterns: com.wgd.* #监控springBean
+      filters: stat,wall #底层开启功能，stat(sql监控)，wall(防火墙)  注意是druid下的filters
+
+      stat-view-servlet: #配置监控页功能
+        enabled: true  #默认开启，这里显示说明
+        login-username: admin #登录名
+        login-password: 123 #登录密码
+        reset-enable: false #禁用重置按钮
+
+      web-stat-filter: #监控web
+        enabled: true
+        url-pattern: /* #监控所有
+        exclusions:  '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'  #放行
+
+      filter:
+        stat:     #对上面filters里的stat的详细配置
+          slow-sql-millis: 1000 #慢sql时间是毫秒单位的  执行时间1秒以上的为慢SQL
+          log-slow-sql: true #日志记录
+          enabled: true
+        wall:
+          enabled: true
+          config:
+            drop-table-allow: false #禁用删除表的SQL
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    filters: stat,wall,log4j
+    maxPoolPreparedStatementPerConnectionSize: 20
+    useGlobalDataSourceStat: true
+    connectionionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+
+mybatis: #mybatis相关配置
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.zy.pojo
+
+eureka:
+  client:
+    register-with-eureka: true   #注册到注册中心
+    service-url:
+      defaultZone: http://127.0.0.1:7001/eureka/     #注册中心地址
+  instance:
+    instance-id: provide-8001    #处理在eureka中的显示
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 2
+    lease-expiration-duration-in-seconds: 4
